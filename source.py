@@ -12,6 +12,7 @@ PRONOUNS = ['PRP', 'PRP$', 'WP', 'WP$']
 REQ = NOUNS + VERBS + PRONOUNS
 
 posToWN = {}
+#print(wn.NOUN + ' ' + wn.VERB)
 for noun in NOUNS:
     posToWN[noun] = wn.NOUN
 for verb in VERBS:
@@ -38,13 +39,35 @@ filtered_wordsToTags = {w: s for w, s in tags if w not in stopword and s in REQ}
 # print(filtered_tags)
 stemmedToWords = {ps.stem(w): w for w in filtered_wordsToTags.keys()}
 # print(stemmed)
-print(stemmedToWords)
+#print(stemmedToWords)
 synonymToStemmedWord = {}
 relatedWordSet = {}
 freq_count = {word: tf(word, token) for word in token}
 freq_score = {word: score(word, token) for word in token}
-print (freq_count)
-print(freq_score)
+#print (freq_count)
+#print(freq_score)
+
+posString = ''
+for word,tag in tags:
+    if tag in posToWN.keys():
+        posString += posToWN[tag]
+    else:
+        posString += '.'
+print(tags)
+
+i = posString.find('n')
+j = i
+nouns = []
+while i < len(posString) and i != -1:
+    #print(str(i) + ' ' + str(j))
+    # comment : consider more than 2 nouns together... Chandler Muriel Bing +ve, -ve ??
+    if j == i - 1:
+        nouns.append(token[j] + ' ' + token[i])
+        relatedWordSet[token[i]] = [token[j]]
+    j = i
+    i = posString.find('n',i + 1)
+
+print(nouns)
 
 for word in stemmedToWords.keys():
     # print(word + " Stemmed")
@@ -62,7 +85,7 @@ for word in stemmedToWords.keys():
                     if word not in relatedWordSet:
                         relatedWordSet[word] = []
                 else:
-                    print(synonymToStemmedWord[synonym] + ' ' + word)
+                    #print(synonymToStemmedWord[synonym] + ' ' + word)
                     if synonymToStemmedWord[synonym] != word:
                         # print(word + " added to " + synonymToStemmedWord[synonym])
                         relatedWordSet[synonymToStemmedWord[synonym]].append(word)
@@ -76,14 +99,17 @@ rootWordFrequency = {}
 rootWordWeight = {}
 
 for root, list in relatedWordSet.iteritems():
-    rootWordFrequency[root] = freq_count[stemmedToWords[root]]
-    rootWordWeight[root] = freq_score[stemmedToWords[root]]
+    #if posToWN[filtered_wordsToTags[root]] != wn.NOUN:
+    rootWordFrequency[root] = freq_count[stemmedToWords.get(root,root)]
+    rootWordWeight[root] = freq_score[stemmedToWords.get(root,root)]
+    #else:
+        #rootWordFrequency[root] = freq_count[root]
     for word in list:
-        rootWordFrequency[root] += freq_count[stemmedToWords[word]]
-        rootWordWeight[root] += freq_score[stemmedToWords[word]]
-print(rootWordFrequency)
-print ("hello\n")
-print(rootWordWeight)
+        rootWordFrequency[root] += freq_count[stemmedToWords.get(word,word)]
+        rootWordWeight[root] += freq_score[stemmedToWords.get(word,word)]
+#print(rootWordFrequency)
+#print ("hello\n")
+#print(rootWordWeight)
 
 # zts = zip(tags,stemmed)
 # print zts
