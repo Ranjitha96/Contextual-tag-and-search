@@ -1,0 +1,12 @@
+catalog
+heel
+bargain
+fashion
+pair
+shoes
+sandal
+footwear
+enterprises
+shoe
+clothes
+socks
